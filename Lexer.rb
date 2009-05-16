@@ -70,11 +70,11 @@ class Lexer
         when /\A(\{#)/
           begin
             skip($&.length)
-	      while @buffer !~ /\A(.*#)/ 
+	      while @buffer !~ /\A([^#]*#)/ 
 		nl()
 		return nil if @input.eof? # ... si se termina el archivo, toma todo como comentario.	
 	      end
-	    skip($&.length)	
+	    skip($1.length)	
 	    # ... Ciclo para verificar el caracter siguiente del segundo #.	
 	    if @buffer =~ /\A\}/
               skip()
