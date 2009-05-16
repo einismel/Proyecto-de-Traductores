@@ -7,16 +7,79 @@ class Lexer
     @buffer    = @input.gets
     @line      = 1
     @col       = 1
+    @h = {'\A(( |\t)+|(#.+))' => :Ignora,'\A\n'=> :nl ,'\A\+' => :Plus, '\A\n' => :nl,'\A\-'=> :Minus, '\A(\w+)' => :Word}
   end
   def skip( n=1 )
     @buffer = @buffer[ n .. -1 ]
     @col = @col + n 
   end
-  def nl()
+  def nl(*opcional)
     @buffer = @input.gets
     @line = @line + 1
     @col = 1
+    return "ignora"
   end
+  def Plus( cl ,cc,t )
+    skip(t.length)
+    return TkPlus.new( cl, cc ) 
+  end
+  def Minus( cl ,cc,t )
+    skip(t.length)
+    return TkMinus.new( cl, cc ) 
+  end
+  def Ignora( cl ,cc, t)
+    skip(t.length)
+    return "ignora"
+  end
+  def Word( cl ,cc, t)
+    begin
+      skip(t.length)
+      case t
+        when "let"
+	  return TkLet.new( cl, cc )
+        when "in"
+	  return TkIn.new( cl, cc )
+        when "begin"
+	  return TkBegin.new( cl, cc )
+        when "end"
+	  return TkEnd.new( cl, cc )
+        when "proc"
+	  return TkProc.new( cl, cc )
+        when "as"
+	  return TkAs.new( cl, cc )
+        when "return"
+	  return TkReturn.new( cl, cc )
+        when "show"
+	  return TkShow.new( cl, cc )
+        else
+	  return TkId.new( cl, cc, t )
+      end
+    end 
+  end
+
+  def yylex2()
+    cl = @line
+    cc = @col
+    t = ""
+    while !(t.nil?)
+      t = nil
+      @h.each { |key,value|
+        if @buffer =~ Regexp.new(key)
+	  t = send(value, cl, cc, $&)
+	  cl = @line
+          cc = @col
+	  return t if (t != "ignora")
+        end
+      }
+    end
+      if (@input.eof? && @buffer.nil?) then
+	return nil
+      else
+        skip()
+	raise  "Linea #{cl}, Columna #{cc}. Simbolo invalido.\n"
+      end 
+  end
+
   def yylex()
     cl = @line
     cc = @col
@@ -79,7 +142,7 @@ class Lexer
 	    if @buffer =~ /\A\}/
               skip()
 	    else
-	      raise "Linea #{@line}, Columna #{@col}. Comentarios Anidados!"
+	      raise "Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n"
 	    end
 	    cl = @line
 	    cc = @col
