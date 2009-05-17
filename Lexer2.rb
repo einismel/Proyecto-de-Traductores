@@ -1,8 +1,18 @@
-# Author:: Einis Rodriguez/Elias Matheus  (mailto:e3matheus@gmail.com)
-require "Token"
+#= Titulo: 
+# Lexer sin el case
+#= Autores: 
+#* Einis Rodriguez
+#* Elias Matheus (mailto:e3matheus@gmail.com)
+#= Contenido: 
+#  Analizador Lexicografico del lenguaje yisiel.
 
+require "Token"
 class Lexer2
   attr_reader :line, :col
+  
+  # Descripcion: Constructor del Lexer
+  # @param input - Archivo al cual debemos analizar
+  # Contiene en 3 listas, las expresiones regulares, asociadas con su función
   def initialize(input)
     @input     = input
     @buffer    = @input.gets
@@ -12,24 +22,44 @@ class Lexer2
     @ERs = {'\A\+' => TkPlus, '\A\-'=> TkMinus, '\A\*' => TkTimes, '\A\/'=> TkDiv,'\A=' => TkSet,'\A(\d+)'=> TkNum, '\A\|\|' => TkDisy, '\A&&' => TkConj, '\A~' => TkNeg, '\A%' => TkRes, '\A<' => TkLess, '\A>' => TkGreat, '\A<=' => TkLE, '\A>=' => TkGE, '\A\$' => TkLength, '\A\(' => TkAP,'\A\)' => TkCP, '\A\[' => TkAC, '\A\]' => TkCC,'\A,' => TkComa, '\A:' => TkPP, '\A->' => TkAsigD, '\A<-'=> TkAsigI, '\A;' => TkPC, '\Aarray of '=> TkArrayOf}	
     @ERc = {'\A(\w+)' => :Word, '\A("[^"]*")'=> :Str, "\A('[^']*')"=> :Str}
   end
+
+  # Descripción: Representa el movimiento en la página.
+  # @param n - Número de pasos a saltar
   def skip( n=1 )
     @buffer = @buffer[ n .. -1 ]
     @col = @col + n 
   end
-  def nl(*option)
+
+  # Descripción: Pasa a la siguiente Linea
+  # @param extra - Parametro opcional, que permite condensar el codigo.  
+  def nl(*extra)
     @buffer = @input.gets
     @line = @line + 1
     @col = 1
 		return "ignora"
   end
+
+  # Descripcion: Crea un Token de String. 
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def Str( cl ,cc,t )
-    print t
     return TkStr.new( cl, cc, t) 
 	end
+
+  # Descripcion: Chequea si hay un comentario anidado, de lo contrario manda a ignorar la expresion. 
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def Ignorar( cl ,cc, t)
     raise "Error Linea #{@line}, Columna #{@col-1}. Comentarios Anidados!\n" if @buffer =~ /[^#]*#/
     return "ignora"
   end
+  
+  # Descripción: Dependiendo del archivo de metadata, crea o un token de palabra reservada o un token de una variable del programa. 
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def Word( cl ,cc, t)
     begin
       case t
@@ -65,7 +95,10 @@ class Lexer2
     end 
   end
 
-	#  Aqui coloque un comentario #Token
+  # Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def Comentario( cl ,cc, t)
 		while @buffer !~ /\A([^#]*)#/ 
 			nl()
@@ -75,7 +108,6 @@ class Lexer2
       end  
 		end
 		skip($1.length)
-		# ... Ciclo para verificar el caracter siguiente del segundo #.	
 		if @buffer =~ /\A#\}/
 			skip(2)
 			return "ignora"
@@ -84,6 +116,11 @@ class Lexer2
 		end
   end
 
+  # Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
+  #* @param h - Hash que recorremos.
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param opcion - Define el tipo de función a ejecutar.
   def searchHash(h, cl, cc, opcion)
 		h.each { |key,value|
 			if @buffer =~ Regexp.new(key)
@@ -99,7 +136,8 @@ class Lexer2
 		return nil
 	end	
 	
-	# Descripcion de yylex2
+  # Descripción: Realiza una busqueda en los hash y devuelve el token mas adecuado a la expresión regular.
+  # De no encontrar ninguno que cuadre, o se acabo el archivo o existe un símbolo inválido. 
   def yylex2()
     t = ""
     while !(t.nil?)

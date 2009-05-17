@@ -1,12 +1,25 @@
-require "Token"
-require "Lexer2"
+#= Titulo: 
+# Main del programa
+#= Autores: 
+#* Einis Rodriguez
+#* Elias Matheus (mailto:e3matheus@gmail.com)
+#= Contenido: 
+#  Compilador del lenguaje yisiel.
+#= Usage 
+#  Usage ruby yisiel.rb [archivo.rb]
+
+require 'rdoc/usage'
+require 'Lexer2'
+require 'Token'
 
 def main
   # ... Dependiendo de si es por consola o si tiene el argumento extra, se elige el archivo
   if (ARGV.length==0)
     archivo = readline.chomp
-  else
+  elsif  (ARGV.length==1)
     archivo = ARGV[0]
+  else
+    puts "you suck"
   end
 
   if File.exists?(archivo)  
