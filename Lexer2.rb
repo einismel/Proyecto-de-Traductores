@@ -8,9 +8,9 @@ class Lexer2
     @buffer    = @input.gets
     @line      = 1
     @col       = 1
-		@ignorar = {'\A\n' => :nl, '\A\{#' => :Comentario, '\A(( |\t)+|(#.+))' => :Ignorar}
-    @ERs = {'\A\+' => TkPlus, '\A\-'=> TkMinus, '\A\*' => TkTimes, '\A\/'=> TkDiv,'\A=' => TkSet,'\A(\d+)'=> TkNum}	
-    @ERc = {'\A(\w+)' => :Word, '\A(".+")'=> :Str,  "\A('.+')"=> :Str}
+		@ignorar = {'\A\n' => :nl, '\A\{#' => :Comentario, '\A(( |\t)+|(#))' => :Ignorar}
+    @ERs = {'\A\+' => TkPlus, '\A\-'=> TkMinus, '\A\*' => TkTimes, '\A\/'=> TkDiv,'\A=' => TkSet,'\A(\d+)'=> TkNum, '\A\|\|' => TkDisy, '\A&&' => TkConj, '\A~' => TkNeg, '\A%' => TkRes, '\A<' => TkLess, '\A>' => TkGreat, '\A<=' => TkLE, '\A>=' => TkGE, '\A\$' => TkLength, '\A\(' => TkAP,'\A\)' => TkCP, '\A\[' => TkAC, '\A\]' => TkCC,'\A,' => TkComa, '\A:' => TkPP, '\A->' => TkAsigD, '\A<-'=> TkAsigI, '\A;' => TkPC, '\Aarray of '=> TkArrayOf}	
+    @ERc = {'\A(\w+)' => :Word, '\A(".+")'=> :Str}
   end
   def skip( n=1 )
     @buffer = @buffer[ n .. -1 ]
@@ -26,29 +26,40 @@ class Lexer2
     return TkStr.new( cl, cc, t) 
 	end
   def Ignorar( cl ,cc, t)
+    raise "Error Linea #{@line}, Columna #{@col-1}. Comentarios Anidados!\n" if @buffer =~ /[^#]*#/
     return "ignora"
   end
   def Word( cl ,cc, t)
     begin
       case t
         when "let"
-	  return TkLet.new( cl, cc )
+          return TkLet.new( cl, cc )
         when "in"
-	  return TkIn.new( cl, cc )
+          return TkIn.new( cl, cc )
         when "begin"
-	  return TkBegin.new( cl, cc )
+          return TkBegin.new( cl, cc )
         when "end"
-	  return TkEnd.new( cl, cc )
+          return TkEnd.new( cl, cc )
         when "proc"
-	  return TkProc.new( cl, cc )
+          return TkProc.new( cl, cc )
         when "as"
-	  return TkAs.new( cl, cc )
+          return TkAs.new( cl, cc )
         when "return"
-	  return TkReturn.new( cl, cc )
+          return TkReturn.new( cl, cc )
         when "show"
-	  return TkShow.new( cl, cc )
-        else
-	  return TkId.new( cl, cc, t )
+          return TkShow.new( cl, cc )
+        when "true"
+          return TkTrue.new( cl, cc )
+        when "false"
+          return TkFalse.new( cl, cc )
+        when "value"
+          return TkValue.new( cl, cc )
+        when "var"
+          return TkVar.new( cl, cc )
+        when "skip"
+          return TkSkip.new( cl, cc )
+      else
+        return TkId.new( cl, cc, t )
       end
     end 
   end
@@ -57,7 +68,10 @@ class Lexer2
   def Comentario( cl ,cc, t)
 		while @buffer !~ /\A([^#]*)#/ 
 			nl()
-			return nil if @input.eof?  # si se termina el archivo, toma todo como comentario.	
+		  if @input.eof?
+        skip(@buffer.length+1)
+        return "ignora"
+      end  
 		end
 		skip($1.length)
 		# ... Ciclo para verificar el caracter siguiente del segundo #.	
@@ -65,7 +79,6 @@ class Lexer2
 			skip(2)
 			return "ignora"
 		else
-			skip()
 			raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n"
 		end
   end
@@ -87,20 +100,16 @@ class Lexer2
 	
 	# Descripcion de yylex2
   def yylex2()
-    cl = @line
-    cc = @col
     t = ""
     while !(t.nil?)
-			t = searchHash(@ignorar, cl, cc, 2)	
-			cl = @line
-			cc = @col
-			f = searchHash(@ERs, cl, cc, 1)
+			t = searchHash(@ignorar, @line, @col, 2)	
+			f = searchHash(@ERs, @line, @col, 1)
 			return f if !(f.nil?)
-			f = searchHash(@ERc, cl, cc, 2)
+			f = searchHash(@ERc, @line, @col, 2)
 			return f if !(f.nil?)
     end
 		return nil if (@input.eof? && @buffer.nil?)
 		skip()
-		raise  "Linea #{cl}, Columna #{cc}. Simbolo invalido.\n" 
+		raise  "Linea #{@line}, Columna #{@col-1}. Simbolo invalido.\n" 
   end
 end
