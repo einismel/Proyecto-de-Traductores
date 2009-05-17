@@ -10,7 +10,7 @@ require "Token"
 class Lexer2
   attr_reader :line, :col
   
-  # Descripcion: Constructor del Lexer
+  # Descripción: Constructor del Lexer
   # @param input - Archivo al cual debemos analizar
   # Contiene en 3 listas, las expresiones regulares, asociadas con su función
   def initialize(input)

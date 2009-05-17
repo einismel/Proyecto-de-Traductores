@@ -1,12 +1,22 @@
-# Author:: Einis Rodriguez/Elias Matheus  (mailto:e3matheus@gmail.com)
+#= Ttulo: 
+# Tokens Admitidos
+#= Autores: 
+#* Einis Rodriguez
+#* Elias Matheus (mailto:e3matheus@gmail.com)
 class Token
   attr_reader :line, :col, :kind, :value
+
+  # Descripción: Constructor de la clase Token
+  #  @param line - Línea Actual del input
+  #  @param col - Columna Actual del input
   def initialize(line, col)
     @line   = line
     @col    = col
     @kind   = "Token"
     @value  = ""
   end
+
+  # Descripción: Método que sobreescribe to_s. Imprime en el formato desea los valores del objeto.
   def to_s
     "Linea #{@line}, Columna #{@col}: #{@kind} #{@value}"
   end
