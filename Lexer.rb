@@ -1,5 +1,4 @@
 # Author:: Einis Rodriguez/Elias Matheus  (mailto:e3matheus@gmail.com)
-
 require "Token"
 
 class Lexer
@@ -25,14 +24,14 @@ class Lexer
     while true
       case @buffer 
           # ... Agregue comentarios de una sola linea.....
-	when /\A(( |\t)+|(#.+))/ 
+	      when /\A(( |\t)+|(#.+))/ 
           skip($&.length)
           cc = @col
         when /\A\n/
           nl()
           cl = @line
-	  # ... Le faltaba la instruccion cc = @col........
-	  cc = @col
+          # ... Le faltaba la instruccion cc = @col........
+          cc = @col
         when /\A\+/
           begin
             skip(1)
@@ -119,7 +118,7 @@ class Lexer
           else
             skip()
 	    raise  "Linea #{cl}, Columna #{cc}. Simbolo invalido.\n"
-          end 
+        end 
       end
     end
   end

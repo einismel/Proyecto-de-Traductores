@@ -10,7 +10,7 @@ class Lexer2
     @col       = 1
 		@ignorar = {'\A\n' => :nl, '\A\{#' => :Comentario, '\A(( |\t)+|(#))' => :Ignorar}
     @ERs = {'\A\+' => TkPlus, '\A\-'=> TkMinus, '\A\*' => TkTimes, '\A\/'=> TkDiv,'\A=' => TkSet,'\A(\d+)'=> TkNum, '\A\|\|' => TkDisy, '\A&&' => TkConj, '\A~' => TkNeg, '\A%' => TkRes, '\A<' => TkLess, '\A>' => TkGreat, '\A<=' => TkLE, '\A>=' => TkGE, '\A\$' => TkLength, '\A\(' => TkAP,'\A\)' => TkCP, '\A\[' => TkAC, '\A\]' => TkCC,'\A,' => TkComa, '\A:' => TkPP, '\A->' => TkAsigD, '\A<-'=> TkAsigI, '\A;' => TkPC, '\Aarray of '=> TkArrayOf}	
-    @ERc = {'\A(\w+)' => :Word, '\A(".+")'=> :Str}
+    @ERc = {'\A(\w+)' => :Word, '\A("[^"]*")'=> :Str, "\A('[^']*')"=> :Str}
   end
   def skip( n=1 )
     @buffer = @buffer[ n .. -1 ]
@@ -23,6 +23,7 @@ class Lexer2
 		return "ignora"
   end
   def Str( cl ,cc,t )
+    print t
     return TkStr.new( cl, cc, t) 
 	end
   def Ignorar( cl ,cc, t)
