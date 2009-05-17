@@ -18,7 +18,7 @@ class Lexer2
     @buffer    = @input.gets
     @line      = 1
     @col       = 1
-		@ignorar = {'\A\n' => :nl, '\A\{#' => :Comentario, '\A(( |\t)+|(#))' => :Ignorar}
+		@ignorar = {'\A\n' => :nl, '\A\{#' => :ComentarioM, '\A(( |\t)+)' => :Ignorar, '\A(#.*)' => :Ignorar}
     @ERs = {'\A\+' => TkPlus, '\A\-'=> TkMinus, '\A\*' => TkTimes, '\A\/'=> TkDiv,'\A=' => TkSet,'\A(\d+)'=> TkNum, '\A\|\|' => TkDisy, '\A&&' => TkConj, '\A~' => TkNeg, '\A%' => TkRes, '\A<' => TkLess, '\A>' => TkGreat, '\A<=' => TkLE, '\A>=' => TkGE, '\A\$' => TkLength, '\A\(' => TkAP,'\A\)' => TkCP, '\A\[' => TkAC, '\A\]' => TkCC,'\A,' => TkComa, '\A:' => TkPP, '\A->' => TkAsigD, '\A<-'=> TkAsigI, '\A;' => TkPC, '\Aarray of '=> TkArrayOf}	
     @ERc = {'\A(\w+)' => :Word, '\A("[^"]*")'=> :Str, "\A('[^']*')"=> :Str}
   end
@@ -52,10 +52,9 @@ class Lexer2
   #* @param cc - Fila Actual en el archivo input.
   #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def Ignorar( cl ,cc, t)
-    raise "Error Linea #{@line}, Columna #{@col-1}. Comentarios Anidados!\n" if @buffer =~ /[^#]*#/
     return "ignora"
   end
-  
+ 
   # Descripción: Dependiendo del archivo de metadata, crea o un token de palabra reservada o un token de una variable del programa. 
   #* @param cl - Columna Actual en el archivo input.
   #* @param cc - Fila Actual en el archivo input.
@@ -63,8 +62,10 @@ class Lexer2
   def Word( cl ,cc, t)
     begin
       case t
-        when "let"
-          return TkLet.new( cl, cc )
+        when "main"
+          return TkMain.new( cl, cc )
+        when "out"
+          return TkOut.new( cl, cc )
         when "in"
           return TkIn.new( cl, cc )
         when "begin"
@@ -89,11 +90,28 @@ class Lexer2
           return TkVar.new( cl, cc )
         when "skip"
           return TkSkip.new( cl, cc )
+        when "if"
+          return TkIf.new( cl, cc )
+        when "fi"
+          return TkFi.new( cl, cc )
+        when "do"
+          return TkDo.new( cl, cc )
+        when "od"
+          return TkOd.new( cl, cc )
       else
         return TkId.new( cl, cc, t )
       end
     end 
   end
+
+  # Descripción: Función de comentarios de líneas simples. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
+  def ComentarioS( cl ,cc, t)
+    nl()
+    return "ignora" 
+  end 
 
   # Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
   #* @param cl - Columna Actual en el archivo input.
@@ -116,6 +134,27 @@ class Lexer2
       skip if @buffer !~ /\A\{/
 			raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n"
 		end
+  end
+
+# Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
+  #* @param cl - Columna Actual en el archivo input.
+  #* @param cc - Fila Actual en el archivo input.
+  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
+  def ComentarioM( cl ,cc, t)
+    puts "Comentario Multiple"
+		while true
+      if @buffer !~ /\A([^#]*)#/
+        skip($&.length-1) 
+        raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n" if @buffer[0].chr.eql? "{"
+        skip(2)       
+        if @buffer =~ "/\A\}/"
+          skip()
+          return "ignora"
+        end
+      else 
+        nl()
+      end
+    end
   end
 
   # Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
@@ -150,7 +189,8 @@ class Lexer2
 			return f if !(f.nil?)
     end
 		return nil if (@input.eof? && @buffer.nil?)
-		skip()
-		raise  "Linea #{@line}, Columna #{@col-1}. Simbolo invalido.\n" 
+		invalido = @buffer[0].chr
+    skip()
+		raise  "Caracter inesperado '#{invalido}' encontrado en linea #{@line}, Columna #{@col-1}.\n" 
   end
 end

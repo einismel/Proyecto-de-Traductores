@@ -110,14 +110,6 @@ class TkCC < Token
   end
 end
 
-class TkCD < Token
-  def initialize(line, col)
-    super(line,col)
-    @kind  = "TkCD"
-    @value = "\""
-  end
-end
-
 class TkLess < Token
   def initialize(line, col)
     super(line,col)
@@ -248,11 +240,11 @@ end
 
 # ... Comienzo de palabras reservadas ......................
 
-class TkLet < Token
+class TkOut < Token
   def initialize(line, col)
     super(line,col)
-    @kind   = "TkLet"
-    @value = "let"
+    @kind   = "TkOut"
+    @value = "out"
   end
 end
 
@@ -327,6 +319,7 @@ class TkFalse < Token
     @value = "false"
   end
 end
+
 class TkValue < Token
   def initialize(line, col)
     super(line,col)
@@ -334,6 +327,7 @@ class TkValue < Token
     @value = "value"
   end
 end
+
 class TkVar < Token
   def initialize(line, col)
     super(line,col)
@@ -341,6 +335,7 @@ class TkVar < Token
     @value = "var"
   end
 end
+
 class TkArrayOf < Token
   def initialize(line, col)
     super(line,col)
@@ -348,10 +343,51 @@ class TkArrayOf < Token
     @value = "array of"
   end
 end
+
 class TkSkip < Token
   def initialize(line, col)
     super(line,col)
     @kind   = "TkSkip"
     @value = "skip"
+  end
+end
+
+class TkIf < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkIf"
+    @value = "if"
+  end
+end
+
+class TkFi < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkFi"
+    @value = "fi"
+  end
+end
+
+class TkDo < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkDo"
+    @value = "do"
+  end
+end
+
+class TkOd < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkOd"
+    @value = "od"
+  end
+end
+
+class TkMain < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkMain"
+    @value = "main"
   end
 end
