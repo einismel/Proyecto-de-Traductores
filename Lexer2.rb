@@ -1,4 +1,4 @@
-#= Titulo: 
+#= Ttulo: 
 # Lexer sin el case
 #= Autores: 
 #* Einis Rodriguez
@@ -39,7 +39,7 @@ class Lexer2
 		return "ignora"
   end
 
-  # Descripcion: Crea un Token de String. 
+  # Descripción: Crea un Token de String. 
   #* @param cl - Columna Actual en el archivo input.
   #* @param cc - Fila Actual en el archivo input.
   #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
@@ -47,7 +47,7 @@ class Lexer2
     return TkStr.new( cl, cc, t) 
 	end
 
-  # Descripcion: Chequea si hay un comentario anidado, de lo contrario manda a ignorar la expresion. 
+  # Descripción: Chequea si hay un comentario anidado, de lo contrario manda a ignorar la expresion. 
   #* @param cl - Columna Actual en el archivo input.
   #* @param cc - Fila Actual en el archivo input.
   #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
@@ -107,11 +107,13 @@ class Lexer2
         return "ignora"
       end  
 		end
-		skip($1.length)
-		if @buffer =~ /\A#\}/
-			skip(2)
+		skip($1.length-1)
+		if @buffer =~ /\A(.)#\}/
+			raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n" if $1.eql? "{"
+      skip(3)
 			return "ignora"
 		else
+      skip if @buffer !~ /\A\{/
 			raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n"
 		end
   end
@@ -136,7 +138,7 @@ class Lexer2
 		return nil
 	end	
 	
-  # Descripción: Realiza una busqueda en los hash y devuelve el token mas adecuado a la expresión regular.
+  # Descripción: Realiza una búsqueda en los hash y devuelve el token mas adecuado a la expresión regular.
   # De no encontrar ninguno que cuadre, o se acabo el archivo o existe un símbolo inválido. 
   def yylex2()
     t = ""

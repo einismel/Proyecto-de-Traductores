@@ -1,26 +1,33 @@
 #= Titulo: 
-# Main del programa
+# Programa Principal del Programa.
 #= Autores: 
 #* Einis Rodriguez
-#* Elias Matheus (mailto:e3matheus@gmail.com)
-#= Contenido: 
-#  Compilador del lenguaje yisiel.
-#= Usage 
-#  Usage ruby yisiel.rb [archivo.rb]
-
+#* Elias Matheus (mailto:e3matheus@gmail.com) 
+#= Usage
+# 
+#  Usage:  ruby yisiel.rb  [archivo]
+ 
 require 'rdoc/usage'
 require 'Lexer2'
 require 'Token'
 
-def main
-  # ... Dependiendo de si es por consola o si tiene el argumento extra, se elige el archivo
-  if (ARGV.length==0)
-    archivo = readline.chomp
-  elsif  (ARGV.length==1)
-    archivo = ARGV[0]
-  else
-    puts "you suck"
+# Descripción: Recibe la cantidad de parámetros en la instrucción. Si recibe uno solo, pide por consola el nombre del archivo. Si recibe dos, toma el segundo argumento como el nombre del archivo. En cualquier otro caso, no acepta la instrucción. 
+#* @param arg - Arreglo que contiene los elementos introducidos en la llamada al archivo.
+def recibeArchivo(arg)
+  case arg.length
+    when 0
+      print "Introduzca el nombre del archivo a analizar: "
+      return readline.chomp
+    when 1
+      return ARGV[0]
+    else
+      RDoc::usage('Usage')
   end
+end
+
+# Descripción: Programa principal. Chequea si el archivo existe, e imprime todos los tokens reconocidos por el analizador lexicográfico. Al encontrar un error del tipo Comentario Anidado, detiene la ejecución del programa.
+def main
+  archivo = recibeArchivo(ARGV)
 
   if File.exists?(archivo)  
     File.open(archivo, "r") do |file|
