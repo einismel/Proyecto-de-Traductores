@@ -1,3 +1,5 @@
+# Clase Token
+# Author::Elias/Einis
 class Token
   attr_reader :line, :col, :kind, :value
   def initialize(line, col)

@@ -1,3 +1,5 @@
+# Author:: Einis Rodriguez/Elias Matheus  (mailto:e3matheus@gmail.com)
+
 require "Token"
 
 class Lexer
@@ -70,19 +72,19 @@ class Lexer
         when /\A(\{#)/
           begin
             skip($&.length)
-	      while @buffer !~ /\A([^#]*#)/ 
-		nl()
-		return nil if @input.eof? # ... si se termina el archivo, toma todo como comentario.	
-	      end
-	    skip($1.length)	
-	    # ... Ciclo para verificar el caracter siguiente del segundo #.	
-	    if @buffer =~ /\A\}/
-              skip()
-	    else
-	      raise "Linea #{@line}, Columna #{@col}. Comentarios Anidados!"
-	    end
-	    cl = @line
-	    cc = @col
+					while @buffer !~ /\A([^#]*#)/ 
+					nl()
+					return nil if @input.eof? # ... si se termina el archivo, toma todo como comentario.	
+					end
+				skip($1.length)	
+				# ... Ciclo para verificar el caracter siguiente del segundo #.	
+				if @buffer =~ /\A\}/
+								skip()
+				else
+					raise "Linea #{@line}, Columna #{@col}. Comentarios Anidados!"
+				end
+				cl = @line
+				cc = @col
           end	
 # ... Fin de Expresiones Regulares nuevas ..................
         when /\A(\w+)/
