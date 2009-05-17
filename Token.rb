@@ -1,3 +1,4 @@
+# Author:: Einis Rodriguez/Elias Matheus  (mailto:e3matheus@gmail.com)
 class Token
   attr_reader :line, :col, :kind, :value
   def initialize(line, col)
@@ -50,8 +51,6 @@ class TkSet < Token
     @value = "="
   end
 end
-
-# Tokens Agregados---------------------------------------------
 
 class TkLength < Token
   def initialize(line, col)
@@ -181,19 +180,35 @@ class TkComa < Token
   end
 end
 
-class TkLet < Token
+class TkPP < Token
   def initialize(line, col)
     super(line,col)
-    @kind   = "TkLet"
-    @value = "let"
+    @kind  = "TkPP"
+    @value = ":"
   end
 end
 
-class TkIn < Token
+class TkAsigD < Token
   def initialize(line, col)
     super(line,col)
-    @kind   = "TkIn"
-    @value = "in"
+    @kind  = "TkAsigD"
+    @value = "->"
+  end
+end
+
+class TkAsigI < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind  = "TkAsigI"
+    @value = "<-"
+  end
+end
+
+class TkPC < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind  = "TkPC"
+    @value = ";"
   end
 end
 
@@ -222,6 +237,22 @@ class TkStr < Token
 end
 
 # ... Comienzo de palabras reservadas ......................
+
+class TkLet < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkLet"
+    @value = "let"
+  end
+end
+
+class TkIn < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkIn"
+    @value = "in"
+  end
+end
 
 class TkBegin < Token
   def initialize(line, col)
@@ -286,5 +317,31 @@ class TkFalse < Token
     @value = "false"
   end
 end
-
-
+class TkValue < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkValue"
+    @value = "value"
+  end
+end
+class TkVar < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkVar"
+    @value = "var"
+  end
+end
+class TkArrayOf < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkArrayOf"
+    @value = "array of"
+  end
+end
+class TkSkip < Token
+  def initialize(line, col)
+    super(line,col)
+    @kind   = "TkSkip"
+    @value = "skip"
+  end
+end

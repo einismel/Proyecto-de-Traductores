@@ -1,6 +1,6 @@
 require "Token"
 require "Lexer"
-
+def main
 # ... Dependiendo de si es por consola o si tiene el argumento extra, se elige el archivo
 if (ARGV.length==0)
 	archivo = readline.chomp
@@ -21,9 +21,12 @@ if File.exists?(archivo)
 				puts f.to_s
 			rescue StandardError => err
 				print err
+				return if err.message[20.. -1].eql? "Comentarios Anidados!"
 			end
 		end
 	end
 else 
 	print "El archivo no existe. Hasta luego."
 end
+end
+main
