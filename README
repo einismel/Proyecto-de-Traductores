@@ -1,0 +1,5 @@
+Para ejecutar el archivo de prueba, ejecuta la siguiente instrucción:
+
+ruby yisiel.rb [prueba.txt]
+
+De no colocar el segundo parámetro, se pide por consola el archivo a analizar.
