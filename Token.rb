@@ -1,4 +1,4 @@
-#= Ttulo: 
+#= Título: 
 # Tokens Admitidos
 #= Autores: 
 #* Einis Rodriguez
@@ -18,7 +18,7 @@ class Token
 
   # Descripción: Método que sobreescribe to_s. Imprime en el formato desea los valores del objeto.
   def to_s
-    "Linea #{@line}, Columna #{@col}: #{@kind} #{@value}"
+    "#{@kind} (Linea #{@line}, Columna #{@col})"
   end
 end
 
@@ -220,6 +220,9 @@ class TkNum < Token
     @kind  = "TkNum"
     @value = val
   end
+  def to_s
+    "#{@kind} #{@value} (Linea #{@line}, Columna #{@col})"
+  end
 end
 
 class TkId < Token
@@ -227,6 +230,9 @@ class TkId < Token
     super(line,col)
     @kind  = "TkId"
     @value = val
+  end
+  def to_s
+    "#{@kind} #{@value} (Linea #{@line}, Columna #{@col})"
   end
 end
 
@@ -236,9 +242,10 @@ class TkStr < Token
     @kind  = "TkStr"
     @value = val
   end
+  def to_s
+    "#{@kind} #{@value} (Linea #{@line}, Columna #{@col})"
+  end
 end
-
-# ... Comienzo de palabras reservadas ......................
 
 class TkOut < Token
   def initialize(line, col)

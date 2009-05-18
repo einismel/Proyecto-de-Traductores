@@ -7,7 +7,7 @@
 #  Analizador Lexicografico del lenguaje yisiel.
 
 require "Token"
-class Lexer2
+class Lexer
   attr_reader :line, :col
   
   # Descripción: Constructor del Lexer
@@ -44,7 +44,7 @@ class Lexer2
   #* @param cc - Fila Actual en el archivo input.
   #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def Str( cl ,cc,t )
-    return TkStr.new( cl, cc, t) 
+    return TkStr.new( cl, cc, t[1..-2]) 
 	end
 
   # Descripción: Chequea si hay un comentario anidado, de lo contrario manda a ignorar la expresion. 
