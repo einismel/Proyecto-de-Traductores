@@ -113,45 +113,24 @@ class Lexer2
     return "ignora" 
   end 
 
-  # Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
-  #* @param cl - Columna Actual en el archivo input.
-  #* @param cc - Fila Actual en el archivo input.
-  #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
-  def Comentario( cl ,cc, t)
-		while @buffer !~ /\A([^#]*)#/ 
-			nl()
-		  if @input.eof?
-        skip(@buffer.length+1)
-        return "ignora"
-      end  
-		end
-		skip($1.length-1)
-		if @buffer =~ /\A(.)#\}/
-			raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n" if $1.eql? "{"
-      skip(3)
-			return "ignora"
-		else
-      skip if @buffer !~ /\A\{/
-			raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n"
-		end
-  end
-
 # Descripción: Función de comentarios de múltiples líneas. Revisa que no existen Comentarios anidados, de haberlos crea un error. 
   #* @param cl - Columna Actual en el archivo input.
   #* @param cc - Fila Actual en el archivo input.
   #* @param t - Archivo de Metadata resultado de comparación con la expresion regular.
   def ComentarioM( cl ,cc, t)
-    puts "Comentario Multiple"
 		while true
-      if @buffer !~ /\A([^#]*)#/
-        skip($&.length-1) 
-        raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n" if @buffer[0].chr.eql? "{"
-        skip(2)       
-        if @buffer =~ "/\A\}/"
+      if @buffer =~ /\A([^#]*)#/
+        if $1.length != 0
+          skip($1.length-1) 
+          raise "Error Linea #{@line}, Columna #{@col}. Comentarios Anidados!\n" if @buffer =~ /\A\{#/
           skip()
+        end
+        if @buffer =~ /\A#\}/
+          skip(2)
           return "ignora"
         end
-      else 
+        skip()
+      else
         nl()
       end
     end
